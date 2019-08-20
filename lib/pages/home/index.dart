@@ -50,12 +50,12 @@ class _IndexState extends State<Index> {
     // );
     Provide.value<DengList>(context).setList([]);
     return Stack(children: <Widget>[
-        // Container(
-        //   padding: EdgeInsets.only(top: 80),
-        //   alignment: Alignment.center,
-        //   child: Text('11'),
-        //   height: 1,
-        // ),
+        Container(
+          padding: EdgeInsets.all(40),
+          alignment: Alignment.center,
+          child: Text('11'),
+          height: 1,
+        ),
         Provide<DengList>(
           builder: (context, child, data){
             return EasyRefresh(
@@ -67,7 +67,7 @@ class _IndexState extends State<Index> {
               // ),
               footer: MaterialFooter(),
               child: ListView.builder(
-                padding: EdgeInsets.only(top: 80),
+                padding: EdgeInsets.only(top: 20),
                 itemCount: data.list.length,
                 itemBuilder: (context, index) => Item(data.list[index]),
               ),
@@ -76,7 +76,7 @@ class _IndexState extends State<Index> {
             );
           }
         ), 
-        Positioned(top: 0,left: 0,right: 0,child: Device(),),
+        Positioned(height: 80,top: 0,left: 0,right: 0,child: Device(),),
       ]
     );
   }
@@ -89,7 +89,27 @@ class _IndexState extends State<Index> {
   void _initSocket() async {
     _channel = IOWebSocketChannel.connect(wsUrl+ DateTime.now().toString());
     _channel.stream.listen((message) {
-      print(message);
+      // print(message);
+      var mes = json.decode(message);
+      print(mes['deviceId']);
+      ItemData item = ItemData.fromJson(mes);
+      
+      List<ItemData> list = Provide.value<DengList>(context).list;
+      print(list);
+      // List<ItemData> nList = list.map((i) {
+      //   if (i.deviceId == item.deviceId) {
+      //     return item;
+      //   } else {
+      //     return i;
+      //   }
+      // }).toList();
+      // Provide.value<DengList>(context).setList(list.map((i) {
+      //   if (i.deviceId == item.deviceId) {
+      //     return item;
+      //   } else {
+      //     return i;
+      //   }
+      // }).toList());
     });
   }
   Future<String> getList() async {
