@@ -18,13 +18,8 @@ class Index extends StatefulWidget {
 
 class _IndexState extends State<Index> {
   int pageNum = 0;
-  IOWebSocketChannel _channel = null;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _initSocket();
-  }
+  IOWebSocketChannel _channel;
+   List<ItemData> list = [];
   @override
   Widget build(BuildContext context) {
     // return Stack(children: <Widget>[
@@ -48,37 +43,37 @@ class _IndexState extends State<Index> {
     //     Positioned(top: 0,left: 0,right: 0,child: Device(),),
     //   ]
     // );
-    Provide.value<DengList>(context).setList([]);
-    return Stack(children: <Widget>[
+    _initSocket();
+    // Provide.value<DengList>(context).setList([]);
+    return Provide<DengList>(
+      builder: (context, child, data){
+        return Stack(children: <Widget>[
         Container(
           padding: EdgeInsets.all(40),
           alignment: Alignment.center,
-          child: Text('11'),
+          child: Text(''),
           height: 1,
         ),
-        Provide<DengList>(
-          builder: (context, child, data){
-            return EasyRefresh(
-              firstRefresh: true,
-              enableControlFinishLoad: false,
-              enableControlFinishRefresh: true,
-              // firstRefreshWidget: Center(
-              //   child: Text('加载中...',style: TextStyle(color: Colors.white, fontSize: 18),),
-              // ),
-              footer: MaterialFooter(),
-              child: ListView.builder(
-                padding: EdgeInsets.only(top: 20),
-                itemCount: data.list.length,
-                itemBuilder: (context, index) => Item(data.list[index]),
-              ),
-              onLoad: getList,
-              onRefresh: getList,
-            );
-          }
+         EasyRefresh(
+          firstRefresh: true,
+          enableControlFinishLoad: true,
+          enableControlFinishRefresh: true,
+          // firstRefreshWidget: Center(
+          //   child: Text('加载中...',style: TextStyle(color: Colors.white, fontSize: 18),),
+          // ),
+          footer: MaterialFooter(),
+          child: ListView.builder(
+            padding: EdgeInsets.only(top: 20),
+            itemCount: data.list.length,
+            itemBuilder: (context, index) => Item(data.list[index]),
+          ),
+          onLoad: getList,
+          onRefresh: getList,
         ), 
         Positioned(height: 80,top: 0,left: 0,right: 0,child: Device(),),
       ]
     );
+    });
   }
   @override
   void dispose() {
@@ -91,18 +86,21 @@ class _IndexState extends State<Index> {
     _channel.stream.listen((message) {
       // print(message);
       var mes = json.decode(message);
-      print(mes['deviceId']);
+      // print(mes['deviceId']);
       ItemData item = ItemData.fromJson(mes);
       
       List<ItemData> list = Provide.value<DengList>(context).list;
-      print(list);
-      // List<ItemData> nList = list.map((i) {
-      //   if (i.deviceId == item.deviceId) {
-      //     return item;
-      //   } else {
-      //     return i;
-      //   }
-      // }).toList();
+      // print(list);
+      List<ItemData> nList = list.map((i) {
+        if (i.deviceId == item.deviceId) {
+          print(item);
+          return item;
+        } else {
+          return i;
+        }
+      }).toList();
+      //加上会卡死
+      // Provide.value<DengList>(context).setList(nList);
       // Provide.value<DengList>(context).setList(list.map((i) {
       //   if (i.deviceId == item.deviceId) {
       //     return item;
@@ -124,8 +122,9 @@ class _IndexState extends State<Index> {
     var response = json.decode(res);
     ListData listData = ListData.fromJson(response);
     if (listData.resultCode == '0000000') {
+      // list.addAll(listData.returnData.list);
       Provide.value<DengList>(context).setList(listData.returnData.list);
-      print(Provide.value<DengList>(context).list.length);
+      // print(Provide.value<DengList>(context).list.length);
     }
     return 'end';
   }

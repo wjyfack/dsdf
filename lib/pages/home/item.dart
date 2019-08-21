@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../model/list_data.dart';
 import './detail.dart';
+import 'package:url_launcher/url_launcher.dart';
 class Item extends StatefulWidget {
   ItemData _item ;
   Item(this._item, {Key key}) : super(key: key);
@@ -104,7 +105,7 @@ class _ItemState extends State<Item> {
   Widget _daohang() {
     return Expanded(
      child: InkWell(
-      onTap: () {},
+      onTap: _toDaoHang,
       child: Column(
         children: <Widget>[
           Text('导航', style: TextStyle(color: Colors.white, fontSize: 18),),
@@ -117,6 +118,16 @@ class _ItemState extends State<Item> {
       ),
      )
     );
+  }
+  void _toDaoHang() async {
+    String lat = widget._item.latitude;
+    String longitude = widget._item.longitude;
+    const url = 'androidamap://keywordNavi?sourceApplication=softname&keyword=宛委山景区&style=2';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
   Widget _chuiz() {
     return Container(

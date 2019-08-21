@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../services/request.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
@@ -51,6 +52,23 @@ class _DetailState extends State<Detail> {
       var data = json.decode(res.toString());
       LogReturn logReturn =  LogReturn.fromJson(data);
       if(logReturn.resultCode == '0000000') {
+        if (logReturn.returnData.list.length == 0) {
+          String name = '';
+          if (_pageNum == 1) {
+            name = '暂无数据';
+          } else {
+            name = '没有更多了';
+          }
+          Fluttertoast.showToast(
+            msg: name,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+          );
+        }
         _list.addAll(logReturn.returnData.list);
       }
     });
